@@ -30,4 +30,13 @@ public class ClusterManager {
         return null;
     }
 
+    public boolean claimResource(String clusterId , int ram, int cpu) {
+        Cluster cluster = clusters.get(clusterId);
+        if(cluster != null){
+            cluster.reAllocateResources(ram, cpu);
+            return true;
+        }
+        return false ;
+    }
+
 }

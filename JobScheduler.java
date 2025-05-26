@@ -5,12 +5,13 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 public class JobScheduler {
     PriorityBlockingQueue<Job> jobs;
-    ExecutorService executors ;
+    private static ExecutorService executors ;
     private ClusterManager clusterManager;
+    private final int maxThread= 2 ;
 
     public JobScheduler() {
         jobs = new PriorityBlockingQueue<>(100 ,  Comparator.comparingInt(Job::getPriority)) ;
-        executors = Executors.newFixedThreadPool(2) ;
+        executors = Executors.newFixedThreadPool(maxThread) ;
         clusterManager = ClusterManager.getInstance();
     }
 
@@ -19,7 +20,30 @@ public class JobScheduler {
         return true;
     }
 
-    public void startJob() {
+    public void init(){
+        int maxT = maxThread ;
+        while(maxT-- > 0 ) {
+            executors.submit(()-> {
+                try {
+                    startJob();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    System.out.println("JobScheduler interrupted");
+                }
+            }) ;
+        }
+    }
+    private void startJob() throws InterruptedException {
+        while(true) {
+            Job job = jobs.take() ;
+            String clusterId = clusterManager.findAnsUseCluster(job.requiredRAM , job.requiredCPU);
+            if(clusterId!= null) {
+                Thread.sleep(5000);
+                clusterManager.claimResource(clusterId , job.requiredRAM , job.requiredCPU);
+            }else{
+                jobs.put(job);
+            }
 
+        }
     }
 }
