@@ -36,10 +36,16 @@ public class JobScheduler {
     private void startJob() throws InterruptedException {
         while(true) {
             Job job = jobs.take() ;
+
             String clusterId = clusterManager.findAnsUseCluster(job.requiredRAM , job.requiredCPU);
             if(clusterId!= null) {
-                Thread.sleep(5000);
-                clusterManager.claimResource(clusterId , job.requiredRAM , job.requiredCPU);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }finally {
+                    clusterManager.claimResource(clusterId , job.requiredRAM , job.requiredCPU);
+                }
             }else{
                 jobs.put(job);
             }
