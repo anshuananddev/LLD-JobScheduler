@@ -36,7 +36,8 @@ public class Cluster {
 
                     ramUsed += ram ;
                     cpuUsed += cpu ;
-
+                    System.out.println("Ram Used: " + ram + " Cpu Used: " + cpu) ;
+                    System.out.println("Ram left: " + availableRam() + " Cpu left: " + availableCpu()) ;
                     return true ;
                 }finally {
                     lock.unlock() ;
@@ -55,6 +56,7 @@ public class Cluster {
             lock.lockInterruptibly();
             ramUsed -= ram ;
             cpuUsed -= cpu ;
+            System.out.println("Re-Allocated RAM: " + ram + " CPU: " + cpu);
             return true ;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

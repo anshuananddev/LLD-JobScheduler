@@ -17,14 +17,14 @@ public class ClusterManager {
     }
 
     public boolean addCluster(Cluster cluster) {
-        clusters.put(UUID.randomUUID().toString(), cluster);
+        clusters.put(cluster.clusterId, cluster);
         return true;
     }
 
     public String findAnsUseCluster(int ram, int cpu) {
         for (Cluster cluster : clusters.values()) {
             if(cluster.useResources(ram, cpu)){
-                return cluster.toString();
+                return cluster.clusterId;
             }
         }
         return null;
